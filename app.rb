@@ -14,13 +14,29 @@ end
 
 def handle_payload
   payload = JSON.parse request.body.read
-  if payload['action'] == 'opened'
-    issue_opened payload['repository']['full_name'], payload['issue']['number']
+
+  case payload['action']
+  when 'opened'
+    issue_opened payload
+  when 'unlabeled'
+    issue_unlabeled payload
   end
 end
 
-def issue_opened(repo, number)
+def issue_opened(payload)
+  repo = payload['repository']['full_name']
+  number = payload['issue']['number']
+
   label_issue repo, number, 'new'
+end
+
+def issue_unlabeled(payload)
+  repo = payload['repository']['full_name']
+  number = payload['issue']['number']
+
+  if payload['issue']['labels'].empty?
+    label_issue repo, number, 'new'
+  end
 end
 
 def label_issue(repo, number, *labels)

@@ -34,7 +34,8 @@ def issue_unlabeled(payload)
   repo = payload['repository']['full_name']
   number = payload['issue']['number']
 
-  if payload['issue']['labels'].empty?
+  # Add new label if issue is open and has no other labels
+  if payload['issue']['state'] == 'open' && payload['issue']['labels'].empty?
     label_issue repo, number, 'new'
   end
 end
